@@ -1,11 +1,9 @@
-import Head from 'next/head'
-import { ISbStoriesParams, ISbStoryParams, StoryblokComponent, getStoryblokApi, useStoryblokState } from '@storyblok/react'
-
-
+import Head from 'next/head';
+import { ISbStoryParams, StoryblokComponent, getStoryblokApi, useStoryblokState } from '@storyblok/react';
 
 export default function Home({ story }: any) {
   story = useStoryblokState(story);
-  console.log('tha blok',story);
+  console.log('tha blok', story);
 
   return (
     <>
@@ -15,34 +13,30 @@ export default function Home({ story }: any) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-   
-      <StoryblokComponent blok={story?.content} />
+      <main>
+        <h1>Hello World</h1>
+
+        <StoryblokComponent blok={story?.content} />
+      </main>
     </>
-  )
+  );
 }
 
+export async function getStaticProps() {
+  let slug = 'home';
 
-export async function getServerSideProps(context: any) {
-  // get the query object
-  const insideStoryblok = context.query._storyblok;
- 
-  let slug = "home";
- 
-  let sbParams :ISbStoryParams = {
-    version: "published", // or 'draft'
+  let sbParams:ISbStoryParams = {
+    version: 'draft', // or 'published'
   };
- 
-  if (insideStoryblok) {
-    sbParams.version = "draft";
-  }
- 
+
   const storyblokApi = getStoryblokApi();
   let { data } = await storyblokApi.get(`cdn/stories/${slug}`, sbParams);
- 
+
   return {
     props: {
       story: data ? data.story : false,
       key: data ? data.story.id : false,
     },
+    revalidate: 3600,
   };
 }
